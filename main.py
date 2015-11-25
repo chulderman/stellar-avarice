@@ -1,5 +1,7 @@
 import os, sys
 import urllib2
+import json
+import random
 
 manifest_location = "http://1.webseed.robertsspaceindustries.com/FileIndex/sc-alpha-2.0.0/"
 
@@ -12,8 +14,8 @@ for item in dir_contents:
 			last_num = item_num
 	else:
 		continue
-# json_fh = open("item_num.json", "r")
 item_num = int(item_num)
+print "Found Latest: " + str(item_num)
 
 for i in range (item_num + 1,item_num + 1001):
 	try:
@@ -30,31 +32,39 @@ for i in range (item_num + 1,item_num + 1001):
 		print 'We failed to reach a server.'
 		print 'Reason: ', e.reason 
 
-# for line in f:
-	# list = []
-	# file_url = line.split('\n')[0]
-	# file_name = line.split('/StarCitizen/')[-1].split('\n')[0
+		
+json_fh = open(str(item_num) + ".json", "r")
+parsed_json = json.load(json_fh)
+
+print "Using Build: " + str(item_num)
+#Grab constants from json
+base_webseed_url = random.choice(parsed_json["webseed_urls"])
+key_prefix = parsed_json["key_prefix"]
 	
-	# if "/" in file_name:
-		# for item in file_name.split('/'):
-			# list.append(item)
-		# file_name = list.pop(-1)
-		# file_path = os.path.join(*list)
-		# try:
-			# os.makedirs(file_path)
-		# except OSError:
-			# pass
-	# file = os.path.join(file_path, file_name)
+for file_name in parsed_json["file_list"]:
+	list = []
+	file_url = base_webseed_url + "/" + key_prefix + "/" + file_name
+	if "/" in file_name:
+		for item in file_name.split('/'):
+			list.append(item)
+		file_name = list.pop(-1)
+		file_path = os.path.join(*list)
+		if not os.path.isdir(file_path):
+			try:
+				os.makedirs(file_path)
+			except OSError:
+				print "Error creating directory: " + file_path
+				
+	file = os.path.join(file_path, file_name)
+	# Begin Downloading Part
 	
-	# # Begin Downloading Part
+	response = urllib2.urlopen(file_url)
 	
-	# response = urllib2.urlopen(file_url)
-	# print "Downloading: " + file
-	# if os.path.isfile(file):
-		# print "File Exists - Updating"
+	print "Downloading: " + file
 	
-	# fh = open(file, "w")
-	# fh.write(response.read())
-	# fh.close()
+	if os.path.isfile(file):
+		print "File Exists - Updating"
 	
-# f.close()
+	fh = open(file, "w")
+	fh.write(response.read())
+	fh.close()
