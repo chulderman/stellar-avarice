@@ -1,5 +1,5 @@
 import os, sys
-import urllib2
+import requests #urllib2
 import json
 import random
 
@@ -21,16 +21,18 @@ for i in range (item_num + 1,item_num + 1001):
 	try:
 		manifest_name = str(i) + ".json"
 		print "Trying: " + manifest_name
-		manifest_response = urllib2.urlopen(manifest_location + manifest_name)
+		#manifest_response = urllib2.urlopen(manifest_location + manifest_name)
+		manifest_response = requests.get(manifest_location + manifest_name)
+		manifest_response.raise_for_status()
 		print "Writing: " + manifest_name
 		manifest_fh = open(manifest_name, "w")
 		manifest_fh.write(manifest_response.read())
 		manifest_fh.close()
-	except urllib2.HTTPError as e:
-		pass
-	except URLError as e:
-		print 'We failed to reach a server.'
-		print 'Reason: ', e.reason 
+	except Exception as e:
+		if(r.status_code==404):
+			print('%s: Page could not be found.' % e.reason)
+		if(r.status_code>=500):
+			print ('%s: Server error [%s]' % (e.reason,r.status_code))  
 
 		
 json_fh = open(str(item_num) + ".json", "r")
@@ -58,13 +60,16 @@ for file_name in parsed_json["file_list"]:
 	file = os.path.join(file_path, file_name)
 	# Begin Downloading Part
 	
-	response = urllib2.urlopen(file_url)
+	print("Downloading: %s" % file)
 	
-	print "Downloading: " + file
+	response = requests.get(file_url)
 	
 	if os.path.isfile(file):
-		print "File Exists - Updating"
+		print("File Exists - Updating")
 	
-	fh = open(file, "w")
-	fh.write(response.read())
-	fh.close()
+	with open(file, "w") as fh:
+	    if not response.ok:
+	        print('File download was unsuccessful')
+	    else:
+	    	for block in response.iter_content(1024):
+	        fh.write(block)
