@@ -1,5 +1,5 @@
 import os, sys
-import urllib2
+import requests #urllib2
 import json
 import random
 
@@ -21,16 +21,17 @@ for i in range (item_num + 1,item_num + 1001):
 	try:
 		manifest_name = str(i) + ".json"
 		print "Trying: " + manifest_name
-		manifest_response = urllib2.urlopen(manifest_location + manifest_name)
+		#manifest_response = urllib2.urlopen(manifest_location + manifest_name)
+		manifest_response = requests.get(manifest_location + manifest_name)
+		manifest_response.raise_for_status()
 		print "Writing: " + manifest_name
 		manifest_fh = open(manifest_name, "w")
 		manifest_fh.write(manifest_response.read())
 		manifest_fh.close()
-	except urllib2.HTTPError as e:
-		pass
-	except URLError as e:
-		print 'We failed to reach a server.'
-		print 'Reason: ', e.reason 
+	except Exception as e:
+		if(r.status_code==404):
+			print 'We failed to reach a server.'
+			print 'Reason: ', e.reason 
 
 		
 json_fh = open(str(item_num) + ".json", "r")
