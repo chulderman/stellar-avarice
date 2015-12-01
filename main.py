@@ -2,16 +2,30 @@ import os, sys
 import requests
 import json
 import random
+import argparse
 
 # Set some initial constants
 manifest_location = "http://1.webseed.robertsspaceindustries.com/FileIndex/sc-alpha-2.0.0/"
 BUILD_RANGE = 10
+VERSION = "0.0.1"
 
-##########################################################3##
+#############################################################
+#                  -- Argument Parsing -                    #
+# Description: 						    					#
+# This block parses the commandline with the argparse 		#
+# library. https://docs.python.org/3/library/argparse.html	#
+#############################################################
+parser = argparse.ArgumentParser(prog="stellar_avarice")
+parser.add_argument('-l', '--latest',
+					help="Display the latest version")
+parser.add_argument('-v', '--version',
+					help="Display program version")
+
+#############################################################
 #               ---- latest_version() ----                  #
-# Description: 						    #
+# Description: 						    					#
 # Function searches the current directory for *.json files  #
-# It returns the highest number it finds		    #
+# It returns the highest number it finds		    		#
 #############################################################
 def latest_version(json_num = 0):
 	dir_contents = [f for f in os.listdir('.') if os.path.isfile(f)]	
