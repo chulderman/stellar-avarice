@@ -23,13 +23,39 @@ def latest_version(json_num = 0):
 				last_json = json_num
 		else:
 			continue
-	return json_num;
+	return int(json_num);
 
-item_num = int(latest_version())
+#############################################################
+#               ---- version_compare() ----                 #
+# Description:												#
+# Function compares two versions by each portion of the		#
+# version number. This allows double digit parts to be 		#
+# compared individually, such as 2.11.0, which would be a 	#
+# newer version than 2.8.0									#
+#############################################################
+def version_compare(num_check):
+	num_split = num_check.split('.')
+	try:
+		latest_num_list=latest_num.split('.')
+		if(isinstance(latest_num_list,list)):	
+			for ind,part in enumerate(num_split):
+				if(part>latest_num_list[ind]):
+					latest_num_list=num_split
+				elif(part==latest_num_list[ind]):
+					continue
+				else:
+					break
+		else:
+			latest_num=num_check
+	except:
+		latest_num=num_check
+	return latest_num
+
+
+
+item_num = latest_version()
 
 print "Found Latest: " + str(item_num)
-
-
 
 for i in range (item_num + 1,item_num + BUILD_RANGE + 1):
 	try:
