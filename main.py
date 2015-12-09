@@ -40,32 +40,31 @@ def latest_build(json_num = 0):
 			continue
 	return last_json
 
-#item_num = int(latest_version())
 
-#print "Found Latest: " + str(item_num)
+def new_build_check():
+	item_num = int(latest_build())
+	print "Found Latest: " + str(item_num)
 
-
-
-# for i in range (item_num + 1,item_num + BUILD_RANGE + 1):
-# 	try:
-# 		manifest_name = str(i) + ".json"
-		
-# 		# Print the latest json that we're trying to test for
-# 		print 'Trying: {}\r'.format(manifest_name)
-# 		manifest_response = requests.get(manifest_location + manifest_name)
-# 		manifest_response.raise_for_status()
-		
-# 		# If it finds the file, doesn't throw an exception and writes the file to disk
-# 		print "Writing: " + manifest_name
-# 		manifest_fh = open(manifest_name, "w")
-# 		manifest_fh.write(manifest_response.read())
-# 		manifest_fh.close()
-# 		item_num = manifest_name
-# 	except Exception as e:
-# 		if(r.status_code==404):
-# 			print('%s: Page could not be found.' % e.reason)
-# 		if(r.status_code>=500):
-# 			print ('%s: Server error [%s]' % (e.reason,r.status_code))  
+	for i in range (item_num + 1,item_num + BUILD_RANGE + 1):
+		try:
+			manifest_name = str(i) + ".json"
+			
+			# Print the latest json that we're trying to test for
+			print 'Trying: {}\r'.format(manifest_name)
+			manifest_response = requests.get(manifest_location + manifest_name)
+			manifest_response.raise_for_status()
+			
+			# If it finds the file, doesn't throw an exception and writes the file to disk
+			print "Writing: " + manifest_name + '\r'
+			manifest_fh = open(manifest_name, "w")
+			manifest_fh.write(manifest_response.read())
+			manifest_fh.close()
+			item_num = manifest_name
+		except Exception as e:
+			if(requests.status_code==404):
+				print('%s: Page could not be found.' % e.reason)
+			if(requests.status_code>=500):
+				print ('%s: Server error [%s]' % (e.reason,requests.status_code))  
 
 
 # # Open up and parse JSON data
@@ -114,5 +113,6 @@ def main():
 		print "Latest Build: {}".format(latest_build())
 		sys.exit(0)
 	else:
+		new_build_check()
 		sys.exit(0)
 main()
