@@ -7,7 +7,7 @@ import argparse
 # Set some initial constants
 manifest_location = "http://1.webseed.robertsspaceindustries.com/FileIndex/sc-alpha-2.0.0/"
 BUILD_RANGE = 10
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 #############################################################
 #                  -- Argument Parsing -                    #
@@ -40,7 +40,6 @@ def latest_build(json_num = 0):
 			continue
 	return last_json
 
-
 def new_build_check():
 	item_num = int(latest_build())
 	print "Found Latest: " + str(item_num)
@@ -65,6 +64,32 @@ def new_build_check():
 				print('%s: Page could not be found.' % e.reason)
 			if(requests.status_code>=500):
 				print ('%s: Server error [%s]' % (e.reason,requests.status_code))  
+
+#############################################################
+#               ---- version_compare() ----                 #
+# Description:												#
+# Function compares two versions by each portion of the		#
+# version number. This allows double digit parts to be 		#
+# compared individually, such as 2.11.0, which would be a 	#
+# newer version than 2.8.0									#
+#############################################################
+def version_compare(num_check):
+	num_split = num_check.split('.')
+	try:
+		latest_num_list=latest_num.split('.')
+		if(isinstance(latest_num_list,list)):	
+			for ind,part in enumerate(num_split):
+				if(part>latest_num_list[ind]):
+					latest_num_list=num_split
+				elif(part==latest_num_list[ind]):
+					continue
+				else:
+					break
+		else:
+			latest_num=num_check
+	except:
+		latest_num=num_check
+	return latest_num
 
 
 # # Open up and parse JSON data
@@ -113,6 +138,7 @@ def main():
 		print "Latest Build: {}".format(latest_build())
 		sys.exit(0)
 	else:
-		new_build_check()
+		## This isn't working right now
+		#new_build_check()
 		sys.exit(0)
 main()
