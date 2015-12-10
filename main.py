@@ -96,7 +96,12 @@ def version_compare(num_check):
 		latest_num=num_check
 	return latest_num
 
-# # Open up and parse JSON data
+#############################################################
+#               ---- parse_json() ----   	                #
+# Description:												#
+# Function grabs the latest json and parses it into an 		#
+# object and then returns that parsed json object			#
+#############################################################
 def parse_json():
 
 	latest_json = str(latest_build())
@@ -105,17 +110,29 @@ def parse_json():
 	parsed_json = json.load(json_fh)
 	return parsed_json
 	
-
+#############################################################
+#               ---- download_build() ----                  #
+# Description:												#
+# Function grabs latest json object and then uses this 		#
+# to create directories it needs. It then starts to 		#
+# download the build via a stream in blocks of 1024			#
+#############################################################
 def download_build():
 	parsed_json = parse_json()
 
+	# Choose a random webseed
 	base_webseed_url = random.choice(parsed_json["webseed_urls"])
+	# The key prefix is the build version that gets appended to the base seed location
 	key_prefix = parsed_json["key_prefix"]
 
-	# Setting constants based on JSON data
 	for file_name in parsed_json["file_list"]:
-		list = []
+		list = [] # A list to hold temporary values
+
+		# Construct the URI based on each file
 		file_url = base_webseed_url + "/" + key_prefix + "/" + file_name
+		
+		# We iterate through the full file list to discover any folders that might be contained within
+		# If we find a folder that doesn't exist, we create this folder
 		if "/" in file_name:
 			for item in file_name.split('/'):
 				list.append(item)
@@ -126,17 +143,22 @@ def download_build():
 					os.makedirs(file_path)
 				except OSError:
 					print "Error creating directory: " + file_path
-					
+		
 		file = os.path.join(file_path, file_name)
 		# Begin Downloading Part
 		
 		print("Downloading: %s" % file)
 		
+		# Create the response object, ensure that it's a stream
+		# so we can start downloading right away
 		response = requests.get(file_url, stream=True)
 		
+		# Let the user know if they're downloading a new file or not
+		# This should have more functionality later
 		if os.path.isfile(file):
 			print("File Exists - Updating")
 		
+		# For each file start writing it.
 		with open(file, "w") as fh:
 		    if not response.ok:
 		        print('File download was unsuccessful')
@@ -144,6 +166,7 @@ def download_build():
 		    	for block in response.iter_content(1024):
 		        	fh.write(block)
 def main():
+	# Used for our just checking the latest build information
 	if args.latest:
 		print "Latest Build: {}".format(latest_build())
 		sys.exit(0)
@@ -152,4 +175,4 @@ def main():
 		new_build_check()
 		download_build()
 		sys.exit(0)
-main()
+main() #Run our code
