@@ -39,7 +39,13 @@ def latest_build(json_num = 0):
 		else:
 			continue
 	return last_json
-
+#############################################################
+#               ---- new_build_check() ----                 #
+# Description:												#
+# Function checks the manifest_location for a new build		#
+# it does this by utilizing the latest version information	#
+# it currently has											#
+#############################################################
 def new_build_check():
 	item_num = int(latest_build())
 	print "Found Latest: " + str(item_num)
@@ -56,14 +62,13 @@ def new_build_check():
 			# If it finds the file, doesn't throw an exception and writes the file to disk
 			print "Writing: " + manifest_name + '\r'
 			manifest_fh = open(manifest_name, "w")
-			manifest_fh.write(manifest_response.read())
+			manifest_fh.write(manifest_response.content)
 			manifest_fh.close()
-			item_num = manifest_name
 		except Exception as e:
-			if(requests.status_code==404):
+			if(manifest_response.status_code==404):
 				print('%s: Page could not be found.' % e.reason)
-			if(requests.status_code>=500):
-				print ('%s: Server error [%s]' % (e.reason,requests.status_code))  
+			if(manifest_response.status_code>=500):
+				print ('%s: Server error [%s]' % (e.reason, manifest_response.status_code))  
 
 #############################################################
 #               ---- version_compare() ----                 #
@@ -139,6 +144,6 @@ def main():
 		sys.exit(0)
 	else:
 		## This isn't working right now
-		#new_build_check()
+		new_build_check()
 		sys.exit(0)
 main()
