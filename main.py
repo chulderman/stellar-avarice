@@ -4,6 +4,7 @@ import json
 import random
 import argparse
 
+
 # Set some initial constants
 manifest_location = "http://1.webseed.robertsspaceindustries.com/FileIndex/sc-alpha-2.0.0/"
 BUILD_RANGE = 10
@@ -55,12 +56,12 @@ def new_build_check():
 			manifest_name = str(i) + ".json"
 			
 			# Print the latest json that we're trying to test for
-			print 'Trying: {}\r'.format(manifest_name)
+			print '\rTrying: {}'.format(manifest_name),
 			manifest_response = requests.get(manifest_location + manifest_name)
 			manifest_response.raise_for_status()
 			
 			# If it finds the file, doesn't throw an exception and writes the file to disk
-			print "Writing: " + manifest_name + '\r'
+			print "\rWriting: {}".format(manifest_name),
 			manifest_fh = open(manifest_name, "w")
 			manifest_fh.write(manifest_response.content)
 			manifest_fh.close()
@@ -142,12 +143,12 @@ def download_build():
 				try:
 					os.makedirs(file_path)
 				except OSError:
-					print "Error creating directory: " + file_path
+					print "\nError creating directory: " + file_path
 		
 		file = os.path.join(file_path, file_name)
 		# Begin Downloading Part
 		
-		print("Downloading: %s" % file)
+		print("\rDownloading: %-100s" % file),
 		
 		# Create the response object, ensure that it's a stream
 		# so we can start downloading right away
@@ -156,15 +157,21 @@ def download_build():
 		# Let the user know if they're downloading a new file or not
 		# This should have more functionality later
 		if os.path.isfile(file):
-			print("File Exists - Updating")
-		
+			print "File Exists - Updating",
+			# if os.path.getsize(file) == response.headers['Content-Length']:
+				# print "Skipping..."
+				# continue
+			# else:
+				# print "Updating..."
+		else:
+			pass
 		# For each file start writing it.
-		with open(file, "w") as fh:
-		    if not response.ok:
-		        print('File download was unsuccessful')
-		    else:
-		    	for block in response.iter_content(1024):
-		        	fh.write(block)
+		# with open(file, "w") as fh:
+		    # if not response.ok:
+		        # print('File download was unsuccessful')
+		    # else:
+		    	# for block in response.iter_content(1024):
+		        	# fh.write(block)
 def main():
 	# Used for our just checking the latest build information
 	if args.latest:
@@ -173,6 +180,11 @@ def main():
 	else:
 		## This isn't working right now
 		new_build_check()
-		download_build()
+		print "\nLatest Build: {}".format(latest_build())
+		prompt = raw_input("Would you like to download this version [y|n]?\n>").lower()
+		if prompt.strip() == 'y': 
+			download_build()
+		else:
+			print "Exiting..."
 		sys.exit(0)
 main() #Run our code
