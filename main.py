@@ -125,6 +125,7 @@ def download_build():
 	base_webseed_url = random.choice(parsed_json["webseed_urls"])
 	# The key prefix is the build version that gets appended to the base seed location
 	key_prefix = parsed_json["key_prefix"]
+	build_name = parsed_json["key_prefix"].split("/")[2] #Grab Build # so that we store build's appropriately
 
 	for file_name in parsed_json["file_list"]:
 		list = [] # A list to hold temporary values
@@ -138,7 +139,7 @@ def download_build():
 			for item in file_name.split('/'):
 				list.append(item)
 			file_name = list.pop(-1)
-			file_path = os.path.join(*list)
+			file_path = os.path.join(build_name, *list)
 			if not os.path.isdir(file_path):
 				try:
 					os.makedirs(file_path)
@@ -158,7 +159,7 @@ def download_build():
 		# This should have more functionality later
 		if os.path.isfile(file):
 			print "File Exists - Updating",
-			# if os.path.getsize(file) == response.headers['Content-Length']:
+			# if <local hash matches remote>
 				# print "Skipping..."
 				# continue
 			# else:
@@ -166,12 +167,12 @@ def download_build():
 		else:
 			pass
 		# For each file start writing it.
-		# with open(file, "w") as fh:
-		    # if not response.ok:
-		        # print('File download was unsuccessful')
-		    # else:
-		    	# for block in response.iter_content(1024):
-		        	# fh.write(block)
+		with open(file, "w") as fh:
+		    if not response.ok:
+		        print('File download was unsuccessful')
+		    else:
+		    	for block in response.iter_content(1024):
+		        	fh.write(block)
 def main():
 	# Used for our just checking the latest build information
 	if args.latest:
