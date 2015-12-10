@@ -188,4 +188,6 @@ def main():
 		else:
 			print "Exiting..."
 		sys.exit(0)
-main() #Run our code
+
+if __name__ == "__main__":
+	main() #Run our code
