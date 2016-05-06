@@ -3,6 +3,7 @@ import requests
 import json
 import random
 import argparse
+import shutil
 
 
 # Set some initial constants
@@ -159,6 +160,7 @@ def download_build():
 		# This should have more functionality later
 		if os.path.isfile(file):
 			print "File Exists - Updating",
+			continue
 			# if <local hash matches remote>
 				# print "Skipping..."
 				# continue
@@ -167,12 +169,12 @@ def download_build():
 		else:
 			pass
 		# For each file start writing it.
-		with open(file, "w") as fh:
+		with open(file, "wb") as fh:
 		    if not response.ok:
 		        print('File download was unsuccessful')
 		    else:
-		    	for block in response.iter_content(1024):
-		        	fh.write(block)
+		    	for block in response.iter_content(chunk_size=1024, decode_unicode=False):
+					fh.write(block)
 def main():
 	# Used for our just checking the latest build information
 	if args.latest:
