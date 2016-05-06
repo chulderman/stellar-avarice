@@ -172,12 +172,12 @@ def download_build():
 		else:
 			pass
 		# For each file start writing it.
-		with open(file, "w") as fh:
+		with open(file, "wb") as fh:
 		    if not response.ok:
 		        print('File download was unsuccessful')
 		    else:
 		    	for block in response.iter_content(1024):
-		        	fh.write(block)
+					fh.write(block)
 def main():
 	# Used for our just checking the latest build information
 	if args.latest:
