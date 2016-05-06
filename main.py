@@ -13,7 +13,7 @@ VERSION = "0.0.3"
 #############################################################
 #                  -- Argument Parsing -                    #
 # Description: 						    					#
-# This block parses the commandline with the argparse 		#
+# This block parses the command-line with the argparse 		#
 # library. https://docs.python.org/3/library/argparse.html	#
 #############################################################
 parser = argparse.ArgumentParser(prog="stellar_avarice", description="An Automated Star Citizen Download Utility")
@@ -24,7 +24,7 @@ parser.add_argument('-v', '--version',
 args = parser.parse_args()
 
 #############################################################
-#               ---- latest_version() ----                  #
+#               ---- latest_build() ----                  #
 # Description: 						    					#
 # Function searches the current directory for *.json files  #
 # It returns the highest number it finds		    		#
@@ -47,22 +47,29 @@ def latest_build(json_num = 0):
 # it does this by utilizing the latest version information	#
 # it currently has											#
 #############################################################
-def new_build_check():
-	version = "Test_version"
-	
-	item_num = int(latest_build())
-	print "Found Latest: " + str(item_num)
+def new_build_check(build):
+	build_loc = {}
+	build_number = {}
+	universes = ['Public', 'Test']
 	
 	manifest_response = requests.get(L_MANIFEST)
 	for line in manifest_response:
-		if version in line:
-			build_number = line.split(' - ')[1]
+		if "version" in line:
+			for entry in universes:
+				if entry in line:
+					version_sel = entry.lower()
+					break
+			build_number[version_sel] = line.split(' - ')[1].split('\r')[0]
 		if "sc-alpha" in line:
-			build_loc = fileIndex_root + line.split('sc-alpha')[1].split('.json')[0] + ".json"
+			if 'ublic' in line:
+				version_sel = 'public'
+			else:
+				version_sel = 'test'
+			build_loc[version_sel] = fileIndex_root + line.split('sc-alpha')[1].split('.json')[0] + ".json" ## currently
 			
-	manifest_name = build_number + ".json"
+	manifest_name = build_number[build] + ".json"
 	try:
-		manifest_response = requests.get(build_loc)
+		manifest_response = requests.get(build_loc[build])
 		manifest_response.raise_for_status()
 		
 		print "\rWriting: {}".format(manifest_name)
@@ -75,6 +82,7 @@ def new_build_check():
 				print('%s: Page could not be found.' % e.reason)
 			if(manifest_response.status_code>=500):
 				print ('%s: Server error [%s]' % (e.reason, manifest_response.status_code))
+	return manifest_name.split('.')[0]
 
 #############################################################
 #               ---- version_compare() ----                 #
@@ -108,9 +116,9 @@ def version_compare(num_check):
 # Function grabs the latest json and parses it into an 		#
 # object and then returns that parsed json object			#
 #############################################################
-def parse_json():
+def parse_json(sel):
 
-	latest_json = str(latest_build())
+	latest_json = str(sel)
 	print "Using: {}".format(latest_json)
 	json_fh = open(latest_json + ".json", "r")
 	parsed_json = json.load(json_fh)
@@ -123,8 +131,8 @@ def parse_json():
 # to create directories it needs. It then starts to 		#
 # download the build via a stream in blocks of 1024			#
 #############################################################
-def download_build():
-	parsed_json = parse_json()
+def download_build(sel):
+	parsed_json = parse_json(sel)
 
 	# Choose a random webseed
 	base_webseed_url = random.choice(parsed_json["webseed_urls"])
@@ -185,11 +193,20 @@ def main():
 		sys.exit(0)
 	else:
 		## This isn't working right now
-		new_build_check()
+		while(True):
+			prompt = raw_input("Which build would you like [public|test]?\n>").lower()
+			if prompt.strip() == 'public':
+				build = 'public'
+				break
+			if prompt.strip() == 'test':
+				build = 'test'
+				break
+		sel_build = new_build_check(build)
 		print "\nLatest Build: {}".format(latest_build())
+		print "Selected Build: {}".format(sel_build)
 		prompt = raw_input("Would you like to download this version [y|n]?\n>").lower()
 		if prompt.strip() == 'y': 
-			download_build()
+			download_build(sel_build)
 		else:
 			print "Exiting..."
 		sys.exit(0)
