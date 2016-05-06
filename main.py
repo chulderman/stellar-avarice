@@ -7,6 +7,7 @@ import argparse
 
 # Set some initial constants
 manifest_location = "http://2.webseed.robertsspaceindustries.com/FileIndex/sc-alpha-2.4.0/"
+L_MANIFEST = "http://manifest.robertsspaceindustries.com/Launcher/_LauncherInfo"
 BUILD_RANGE = 10
 VERSION = "0.0.3"
 
@@ -48,9 +49,37 @@ def latest_build(json_num = 0):
 # it currently has											#
 #############################################################
 def new_build_check():
+	version = "Test_version"
+	version_loc = "Test_fileIndex"
+	
 	item_num = int(latest_build())
 	print "Found Latest: " + str(item_num)
-
+	
+	# manifest_response = requests.get(L_MANIFEST)
+	
+	# for line in manifest_response:
+		# if version in line:
+			# build_number = line.split(' - ')[1]
+		# if version_loc in line:
+			# build_loc = line.split(' = ')[1]
+			
+	# manifest_name = build_number + ".json"
+	# try:
+		# manifest_response = requests.get(build_loc)
+		# manifest_response.raise_for_status()
+		
+		# print "\rWriting: {}".format(manifest_name)
+		# manifest_fh = open(manifest_name, "w")
+		# manifest_fh.write(manifest_response.content)
+		# manifest_fh.close()
+		
+	# except Exception as e:
+			# if(manifest_response.status_code==404):
+				# print('%s: Page could not be found.' % e.reason)
+			# if(manifest_response.status_code>=500):
+				# print ('%s: Server error [%s]' % (e.reason, manifest_response.status_code))
+	
+	
 	for i in range (item_num + 1,item_num + BUILD_RANGE + 1):
 		try:
 			manifest_name = str(i) + ".json"
