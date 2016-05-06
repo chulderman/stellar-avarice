@@ -194,12 +194,9 @@ def main():
 	else:
 		## This isn't working right now
 		while(True):
-			prompt = raw_input("Which build would you like [public|test]?\n>").lower()
-			if prompt.strip() == 'public':
-				build = 'public'
-				break
-			if prompt.strip() == 'test':
-				build = 'test'
+			prompt = raw_input("Which build would you like [public|test]?\n>").lower().strip()
+			if prompt in ('public','test'):
+				build = prompt
 				break
 		sel_build = new_build_check(build)
 		print "\nLatest Build: {}".format(latest_build())
