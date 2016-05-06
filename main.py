@@ -6,9 +6,9 @@ import argparse
 
 
 # Set some initial constants
-manifest_location = "http://1.webseed.robertsspaceindustries.com/FileIndex/sc-alpha-2.0.0/"
+manifest_location = "http://2.webseed.robertsspaceindustries.com/FileIndex/sc-alpha-2.4.0/"
 BUILD_RANGE = 10
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 #############################################################
 #                  -- Argument Parsing -                    #
