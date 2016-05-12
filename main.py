@@ -158,7 +158,9 @@ def download_build(sel):
 					os.makedirs(file_path)
 				except OSError:
 					print "\nError creating directory: " + file_path
-		
+		else:
+			file_path = "" # File is in root directory.
+
 		file = os.path.join(file_path, file_name)
 		# Begin Downloading Part
 		
