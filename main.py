@@ -3,6 +3,7 @@ import requests
 import json
 import random
 import argparse
+from utilities.build_info import BuildInfo
 
 
 # Set some initial constants
@@ -111,20 +112,6 @@ def version_compare(num_check):
 	return latest_num
 
 #############################################################
-#               ---- parse_json() ----   	                #
-# Description:												#
-# Function grabs the latest json and parses it into an 		#
-# object and then returns that parsed json object			#
-#############################################################
-def parse_json(sel):
-
-	latest_json = str(sel)
-	print "Using: {}".format(latest_json)
-	json_fh = open(latest_json + ".json", "r")
-	parsed_json = json.load(json_fh)
-	return parsed_json
-	
-#############################################################
 #               ---- download_build() ----                  #
 # Description:												#
 # Function grabs latest json object and then uses this 		#
@@ -132,13 +119,12 @@ def parse_json(sel):
 # download the build via a stream in blocks of 1024			#
 #############################################################
 def download_build(sel):
-	parsed_json = parse_json(sel)
+	build = BuildInfo(sel)
 
-	# Choose a random webseed
-	base_webseed_url = random.choice(parsed_json["webseed_urls"])
-	# The key prefix is the build version that gets appended to the base seed location
-	key_prefix = parsed_json["key_prefix"]
-	build_name = parsed_json["key_prefix"].split("/")[2] #Grab Build # so that we store build's appropriately
+	# Gather Information
+	base_webseed_url = build.base_webseed_url
+	key_prefix = build.key_prefix
+	build_num = build.build_num
 
 	for file_name in parsed_json["file_list"]:
 		list = [] # A list to hold temporary values
@@ -152,7 +138,7 @@ def download_build(sel):
 			for item in file_name.split('/'):
 				list.append(item)
 			file_name = list.pop(-1)
-			file_path = os.path.join(build_name, *list)
+			file_path = os.path.join(build_num, *list)
 			if not os.path.isdir(file_path):
 				try:
 					os.makedirs(file_path)
